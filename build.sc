@@ -9,9 +9,12 @@ import edu.holycross.shot.ohco2._
 import edu.holycross.shot.cite._
 import java.io.PrintWriter
 
+// Default values for commentedPassages function:
+// title of web page and src files to use for commentary and text corpus.
+val title = "Livy 2.1 with commentary"
 val fName = "src/docs/commentary.cex"
-val textCex = "livy-tiny.cex"
-val livy =  CorpusSource.fromFile(textCex, cexHeader = true)
+val textCex = "data/livy-tiny.cex"
+val corpus =  CorpusSource.fromFile(textCex, cexHeader = true)
 
 
 /** Match leaf-node URNs with comments.
@@ -43,18 +46,28 @@ def buildCommentary(commentaryFile: String = fName) : Vector[(CtsUrn, Vector[Str
   comments.toVector.groupBy(_._1).toVector.map{ case (k,v) => (k, v.map(_._2).toVector) }
 }
 
+/** Construct a page of passages with commentary for all citable nodes in a Corpus.
+*
+* @param title Title of web page
+* @param corpus Text corpus to display
+* @param commentary Commentary to attach to citable nodes.
+*/
 def commentedPassages (title: String, corpus: Corpus, commentary: Map[CtsUrn, Vector[String]]) : String = {
   val pageHeader = s"<html>\n<head>\n<title>${title}</title>\n" +
   "<link rel=\"stylesheet\" href=\"includes/cite_text_commentary.css\">\n" +
+  "<link rel=\"stylesheet\" href=\"includes/latin213.css\">\n" +
 	"<script type=\"text/javascript\" src=\"includes/jquery-3.4.1.min.js\"></script>\n" +
-  "</head>\n<!-- α -->\n<body>\n"
+  "</head>\n<!--Include one non-ASCII character! α -->\n<body>\n"
+
+
   val pageTail = "\n</body>\n<script type=\"text/javascript\" src=\"includes/cite_text_commentary.js\"></script>\n</html>"
 
   val passages = for (n <- corpus.nodes) yield {
-    val psgHeader = 	"\n<div class=\"ohco2_commentedPassage\">\n\t<p>" + n.text + "</p>\n"
+    val psgHeader = 	"\n<div class=\"ohco2_commentedPassage\">\n\t<p>" +
+    n.text.replaceAll("\\+", "") + "</p>\n"
     val psgTail = "\n</div>\n"
     val psgComments = if (commentary.contains(n.urn)) {
-      commentary(n.urn).map(_.replaceAll("\\+", ""))
+      commentary(n.urn)
     } else {
       Vector("")
     }
@@ -65,3 +78,6 @@ def commentedPassages (title: String, corpus: Corpus, commentary: Map[CtsUrn, Ve
 
 
 val commentary = buildCommentary().toMap
+val html =  commentedPassages(title, corpus, commentary)
+
+new PrintWriter("output.html"){write(html);close;}
