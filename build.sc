@@ -14,8 +14,23 @@ import java.io.PrintWriter
 val title = "Livy 2.1 with commentary"
 val fName = "src/docs/commentary.cex"
 val textCex = "data/livy-tiny.cex"
+val preface = "preface.md"
 val corpus =  CorpusSource.fromFile(textCex, cexHeader = true)
 
+/** Read markdown from a file and convert it to HTML.
+*
+* @param fName Name of file with markdown content.
+*/
+def htmlFromMdFile(fName: String) : String = {
+  val markdown = Source.fromFile(fName).getLines.toVector.mkString
+  val xformed = transformer.transform(markdown)
+  xformed match {
+    case Right(html) => {
+      html
+    }
+    case _ => ""
+  }
+}
 
 /** Match leaf-node URNs with comments.
 *
@@ -52,12 +67,14 @@ def buildCommentary(commentaryFile: String = fName) : Vector[(CtsUrn, Vector[Str
 * @param corpus Text corpus to display
 * @param commentary Commentary to attach to citable nodes.
 */
-def commentedPassages (title: String, corpus: Corpus, commentary: Map[CtsUrn, Vector[String]]) : String = {
+def commentedPassages (title: String, prefaceFile: String, corpus: Corpus, commentary: Map[CtsUrn, Vector[String]]) : String = {
+  val preface = Source.fromFile(prefaceFile).getLines.toVector.mkString("\n")
   val pageHeader = s"<html>\n<head>\n<title>${title}</title>\n" +
   "<link rel=\"stylesheet\" href=\"includes/cite_text_commentary.css\">\n" +
   "<link rel=\"stylesheet\" href=\"includes/latin213.css\">\n" +
 	"<script type=\"text/javascript\" src=\"includes/jquery-3.4.1.min.js\"></script>\n" +
-  "</head>\n<!--Include one non-ASCII character! α -->\n<body>\n"
+  "</head>\n<!--Include one non-ASCII character! α -->\n<body>\n" + preface + s"<h2>${title}</h2>\n\n"
+
 
 
   val pageTail = "\n</body>\n<script type=\"text/javascript\" src=\"includes/cite_text_commentary.js\"></script>\n</html>"
@@ -78,6 +95,6 @@ def commentedPassages (title: String, corpus: Corpus, commentary: Map[CtsUrn, Ve
 
 
 val commentary = buildCommentary().toMap
-val html =  commentedPassages(title, corpus, commentary)
+val html =  commentedPassages(title, preface, corpus, commentary)
 
 new PrintWriter("output.html"){write(html);close;}
