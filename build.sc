@@ -3,15 +3,16 @@ import laika.api._
 import laika.format._
 val transformer = Transformer.from(Markdown).to(HTML).build
 
-val fName = "src/docs/commentary.cex"
-val textCex = "livy-tiny.cex"
-val livy =  CorpusSource.fromFile(textCex, cexHeader = true)
-
-
 
 import scala.io.Source
 import edu.holycross.shot.ohco2._
 import edu.holycross.shot.cite._
+import java.io.PrintWriter
+
+val fName = "src/docs/commentary.cex"
+val textCex = "livy-tiny.cex"
+val livy =  CorpusSource.fromFile(textCex, cexHeader = true)
+
 
 /** Match leaf-node URNs with comments.
 *
@@ -29,9 +30,9 @@ def buildCommentary(commentaryFile: String = fName) : Vector[(CtsUrn, Vector[Str
       val xformed = transformer.transform(columns(2))
       val commentaryText = xformed match {
         case Right(html) => {
-          val header = "<div class=\"ohco2_commentBlock\" data-commentBlockLabel=\"" + columns(1) + "\">"
-          val trail = "</div>"
-          header + html + trail
+          val header = "\t<div class=\"ohco2_commentBlock\" data-commentBlockLabel=\"" + columns(1) + "\">"
+          val trail = "\t</div>"
+          header + "\t" + html + "\n" + trail + "\n"
         }
         case _ => ln
       }
@@ -42,22 +43,18 @@ def buildCommentary(commentaryFile: String = fName) : Vector[(CtsUrn, Vector[Str
   comments.toVector.groupBy(_._1).toVector.map{ case (k,v) => (k, v.map(_._2).toVector) }
 }
 
-val commentary = buildCommentary().toMap
-
-
-
 def commentedPassages (title: String, corpus: Corpus, commentary: Map[CtsUrn, Vector[String]]) : String = {
-  val pageHeader = s"<html><head><title>${title}</title>" +
-  "<link rel=\"stylesheet\" href=\"includes/commentary.css\">" +
-	"<script type=\"text/javascript\" src=\"includes/jquery-3.4.1.min.js\"></script>" +
-  "</head>"
-  val pageTail = "<script type=\"text/javascript\" src=\"cite_text_commentary.js\"></script></html>"
+  val pageHeader = s"<html>\n<head>\n<title>${title}</title>\n" +
+  "<link rel=\"stylesheet\" href=\"includes/cite_text_commentary.css\">\n" +
+	"<script type=\"text/javascript\" src=\"includes/jquery-3.4.1.min.js\"></script>\n" +
+  "</head>\n<!-- α -->\n<body>\n"
+  val pageTail = "\n</body>\n<script type=\"text/javascript\" src=\"includes/cite_text_commentary.js\"></script>\n</html>"
 
   val passages = for (n <- corpus.nodes) yield {
-    val psgHeader = 	"<div class=\"ohco2_commentedPassage\"><p>" + n.text + "</p>"
-    val psgTail = "</div>"
+    val psgHeader = 	"\n<div class=\"ohco2_commentedPassage\">\n\t<p>" + n.text + "</p>\n"
+    val psgTail = "\n</div>\n"
     val psgComments = if (commentary.contains(n.urn)) {
-      commentary(n.urn).map(_.replaceAll("+", ""))
+      commentary(n.urn).map(_.replaceAll("\\+", ""))
     } else {
       Vector("")
     }
@@ -65,3 +62,6 @@ def commentedPassages (title: String, corpus: Corpus, commentary: Map[CtsUrn, Ve
   }
   pageHeader + passages.mkString("\n\n") + pageTail
 }
+
+
+val commentary = buildCommentary().toMap
