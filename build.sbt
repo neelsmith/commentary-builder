@@ -7,8 +7,8 @@ resolvers += Resolver.bintrayRepo("neelsmith", "maven")
 
 
 name := "commentarybuilder"
-organization := "edu.holycross.shot.cite"
-version := "0.2.0"
+organization := "edu.holycross.shot"
+version := "0.3.0"
 licenses +=("GPL-3.0",url("https://opensource.org/licenses/gpl-3.0.html"))
 
 libraryDependencies ++= Seq(
