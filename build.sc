@@ -13,7 +13,7 @@ import java.io.PrintWriter
 // title of web page and src files to use for commentary and text corpus.
 val title = "Livy 2.1 with commentary"
 val fName = "src/docs/commentary.cex"
-val textCex = "data/livy-tiny.cex"
+val textCex = "data/livy-selection.cex"
 val preface = "preface.md"
 val corpus =  CorpusSource.fromFile(textCex, cexHeader = true)
 
