@@ -14,3 +14,9 @@ trait Comment {
   /** Text of the comment.*/
   def comment: String
 }
+
+/*
+trait Commentary {
+  def comments: Map[Urn, Vector[Comment]]
+}
+*/
