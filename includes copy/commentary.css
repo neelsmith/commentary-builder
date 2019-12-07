@@ -1,0 +1,59 @@
+
+div.ohco2_commentedPassage {
+	display: flex;
+	flex-direction: row ;
+	flex-wrap: wrap ;
+	align-items: center;
+	justify-content: flex-start
+}
+
+div.ohco2_commentBlock_hidden > * {
+	display: none;
+	clear: both;
+}
+
+div.ohco2_commentBlock_hidden::after {
+	content: attr(data-commentBlockLabel);
+	font-size: 80%;
+  font-weight: bold;
+	//border: 1px solid black;
+	border-radius: 7px;
+	margin: 0 0 0 1em;
+  //margin-top: -10px;
+	padding: 3px;
+	display: inline-block;
+	order: 4;
+  background-color: #CCCCCC;
+
+}
+
+div.ohco2_commentBlock_hidden:hover::after {
+	background-color: #eee;
+}
+
+div.ohco2_commentBlock.ohco2_commentBlock_visible {
+	display: block;
+	flex-basis: 100%;
+	padding: 1em 0 0 0;
+}
+
+.ohco2_commentBlock_visible > span.ohco2_commentBlock_close {
+	  float: left;
+		margin-top: -5px;
+		margin-right: 10;
+		cursor: pointer;
+		color: black;
+		//border: 1px solid #69626b;
+		border-radius: 40px;
+		background: rgba(0, 0, 0, 0.10);
+		font-size: 18px;
+		font-weight: bold;
+		display: inline-block;
+		line-height: 4px;
+		padding: 11px 8px;
+}
+
+.ohco2_commentBlock_visible > span.ohco2_commentBlock_close:hover {
+	background: rgba(0, 0, 0, 0.33);
+	color: white;
+}

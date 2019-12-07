@@ -1,3 +1,4 @@
+package edu.holycross.shot.commentary
 
 import org.scalatest.FlatSpec
 
